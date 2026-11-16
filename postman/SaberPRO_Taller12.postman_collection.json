@@ -1,0 +1,86 @@
+{
+  "info": {
+    "name": "Saber PRO Taller 12 - Hexagonal",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Crear, consultar, enviar a revision y comprobar rechazo de una pregunta."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "preguntaId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Crear pregunta valida",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) pm.collectionVariables.set(\"preguntaId\", pm.response.json().id);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"enunciado\":\"¿Qué principio SOLID favorece la extensión sin modificación?\",\"justificacion\":\"El principio abierto cerrado permite extender comportamiento sin modificar el código existente.\",\"opciones\":[{\"texto\":\"Responsabilidad única\",\"correcta\":false},{\"texto\":\"Abierto cerrado\",\"correcta\":true},{\"texto\":\"Sustitución de Liskov\",\"correcta\":false},{\"texto\":\"Inversión de dependencias\",\"correcta\":false}]}"
+        },
+        "url": "{{baseUrl}}/api/preguntas"
+      }
+    },
+    {
+      "name": "02 - Buscar pregunta",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/preguntas/{{preguntaId}}"
+      }
+    },
+    {
+      "name": "03 - Enviar a revision",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/preguntas/{{preguntaId}}/enviar-revision"
+      }
+    },
+    {
+      "name": "04 - Reenviar (debe ser 400)",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/preguntas/{{preguntaId}}/enviar-revision"
+      }
+    },
+    {
+      "name": "05 - Justificacion corta (400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"enunciado\": \"Ejemplo invalido\",\n  \"justificacion\": \"corta\",\n  \"opciones\": [\n    {\n      \"texto\": \"A\",\n      \"correcta\": true\n    },\n    {\n      \"texto\": \"B\",\n      \"correcta\": false\n    },\n    {\n      \"texto\": \"C\",\n      \"correcta\": false\n    },\n    {\n      \"texto\": \"D\",\n      \"correcta\": false\n    }\n  ]\n}"
+        },
+        "url": "{{baseUrl}}/api/preguntas"
+      }
+    }
+  ]
+}
